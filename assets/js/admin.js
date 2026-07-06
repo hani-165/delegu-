@@ -63,11 +63,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     state.documents.forEach((item) => {
       const article = document.createElement("article");
       article.className = "document-item";
+      const extension = store.getExtension(item.file_name);
       article.innerHTML = `
-        <div class="document-top">
+        <div class="document-row">
+          <div class="document-icon" data-ext="${extension}">${extension}</div>
           <div class="document-main">
-            <div class="document-actions">
-              <span class="type-badge">${store.getExtension(item.file_name)}</span>
+            <div class="document-badges">
               <span class="meta-badge">${item.category}</span>
             </div>
             <h3>${item.title}</h3>
