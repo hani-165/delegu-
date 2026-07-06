@@ -6,7 +6,7 @@
         <title>Portail des cours - Administration</title>
         <meta
             name="description"
-            content="Espace d’administration simplifié pour le délégué: publication de documents, annonces et gestion locale du portail."
+            content="Espace d’administration du portail des cours : publication de documents et gestion des annonces."
         />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -61,12 +61,12 @@
                         hidden
                     >
                         <p class="section-label">Configuration requise</p>
-                        <h1>Supabase n’est pas encore connecté</h1>
+                        <h1>Le service n’est pas encore configuré</h1>
                         <p>
-                            Renseignez l’URL et la clé publique de votre projet
-                            dans <code>assets/js/config.js</code>, puis
-                            rechargez cette page. Consultez
-                            <code>README.md</code> pour la procédure complète.
+                            Renseignez les paramètres de connexion dans
+                            <code>assets/js/config.js</code>, puis rechargez
+                            cette page. Consultez <code>README.md</code> pour la
+                            procédure complète.
                         </p>
                     </article>
 
@@ -78,9 +78,9 @@
                         <p class="section-label">Accès délégué</p>
                         <h1>Connexion du délégué</h1>
                         <p>
-                            Les étudiants consultent le site publiquement sans
-                            compte. Seul le compte délégué, créé dans Supabase,
-                            peut publier des documents ici.
+                            Connectez-vous avec votre compte délégué pour
+                            publier des documents et gérer les annonces de la
+                            promotion.
                         </p>
                         <form id="admin-login-form" class="stack-form">
                             <label>
@@ -108,10 +108,6 @@
                             </button>
                         </form>
                         <p id="login-error" class="form-error" hidden></p>
-                        <p class="helper-text">
-                            Le compte du délégué se crée depuis le tableau de
-                            bord Supabase (Authentication &gt; Users).
-                        </p>
                     </article>
                 </section>
 
@@ -125,14 +121,14 @@
                                 Publier des documents pour toute la promotion
                             </h1>
                             <p class="hero-text">
-                                Cette version se concentre sur l’essentiel:
-                                dépôt de documents, téléchargement public et
-                                annonces simples.
+                                Publiez les documents de cours, gérez les
+                                annonces et suivez l’activité de la promotion
+                                depuis un espace unique.
                             </p>
                             <div class="hero-badges">
-                                <span>Pas de compte étudiant</span>
-                                <span>Une seule page admin</span>
-                                <span>Gestion locale instantanée</span>
+                                <span>Accès sécurisé</span>
+                                <span>Publication instantanée</span>
+                                <span>Mise à jour en temps réel</span>
                             </div>
                         </div>
 
@@ -317,10 +313,10 @@
                                 <div class="info-note info-note-warning">
                                     <strong>Bon à savoir</strong>
                                     <p>
-                                        Ce compte est géré par Supabase
-                                        Authentication. Les étudiants n’ont
-                                        besoin d’aucun compte pour consulter ou
-                                        télécharger les documents.
+                                        Ce mot de passe protège l’accès à
+                                        l’espace de publication. Il est
+                                        personnel et ne doit être partagé avec
+                                        personne.
                                     </p>
                                 </div>
                             </section>

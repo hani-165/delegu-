@@ -146,7 +146,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   async function refresh() {
     if (!store.isConfigured()) {
       elements.lastUpdate.textContent =
-        "Supabase n'est pas encore configuré. Voir assets/js/config.js et README.md.";
+        "Le service est momentanément indisponible. Merci de réessayer plus tard.";
       elements.empty.hidden = false;
       return;
     }
