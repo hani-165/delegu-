@@ -10,6 +10,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     loginError: document.getElementById("login-error"),
     logoutButton: document.getElementById("admin-logout"),
     documentForm: document.getElementById("document-form"),
+    documentFormTitle: document.getElementById("document-form-title"),
+    documentSubmitButton: document.getElementById("document-submit-button"),
+    cancelDocumentEdit: document.getElementById("cancel-document-edit"),
     fileInput: document.getElementById("doc-file"),
     selectedFile: document.getElementById("selected-file"),
     documentsList: document.getElementById("admin-documents-list"),
@@ -17,6 +20,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     announcementsList: document.getElementById("admin-announcements-list"),
     announcementsEmpty: document.getElementById("admin-announcements-empty"),
     announcementForm: document.getElementById("announcement-form"),
+    announcementFormTitle: document.getElementById("announcement-form-title"),
+    announcementSubmitButton: document.getElementById(
+      "announcement-submit-button",
+    ),
+    cancelAnnouncementEdit: document.getElementById("cancel-announcement-edit"),
     changePasswordForm: document.getElementById("change-password-form"),
     docCount: document.getElementById("admin-doc-count"),
     subjectCount: document.getElementById("admin-subject-count"),
@@ -32,6 +40,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   const state = { documents: [], announcements: [] };
+  let editingDocumentId = null;
+  let editingDocumentFilePath = null;
+  let editingAnnouncementId = null;
 
   function subjectsCount() {
     return new Set(state.documents.map((item) => item.subject).filter(Boolean))
@@ -54,6 +65,66 @@ document.addEventListener("DOMContentLoaded", async () => {
     elements.gate.hidden = false;
     elements.loginCard.hidden = false;
     elements.app.hidden = true;
+  }
+
+  function resetDocumentForm() {
+    editingDocumentId = null;
+    editingDocumentFilePath = null;
+    elements.documentForm.reset();
+    elements.fileInput.required = true;
+    elements.selectedFile.textContent = "Aucun fichier sélectionné.";
+    elements.documentFormTitle.textContent = "Ajouter un document";
+    elements.documentSubmitButton.textContent = "Publier le document";
+    elements.cancelDocumentEdit.hidden = true;
+  }
+
+  function startEditDocument(item) {
+    editingDocumentId = item.id;
+    editingDocumentFilePath = item.file_path;
+
+    document.getElementById("doc-title").value = item.title;
+    document.getElementById("doc-subject").value = item.subject;
+    document.getElementById("doc-teacher").value = item.teacher;
+    document.getElementById("doc-category").value = item.category;
+    document.getElementById("doc-description").value = item.description || "";
+    elements.fileInput.value = "";
+    elements.fileInput.required = false;
+    elements.selectedFile.textContent = `Fichier actuel : ${item.file_name}. Choisissez un nouveau fichier pour le remplacer, ou laissez ce champ vide pour le conserver.`;
+
+    elements.documentFormTitle.textContent = "Modifier le document";
+    elements.documentSubmitButton.textContent = "Mettre à jour le document";
+    elements.cancelDocumentEdit.hidden = false;
+
+    elements.documentForm.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+  }
+
+  function resetAnnouncementForm() {
+    editingAnnouncementId = null;
+    elements.announcementForm.reset();
+    elements.announcementFormTitle.textContent = "Publier une annonce";
+    elements.announcementSubmitButton.textContent = "Publier l'annonce";
+    elements.cancelAnnouncementEdit.hidden = true;
+  }
+
+  function startEditAnnouncement(announcement) {
+    editingAnnouncementId = announcement.id;
+
+    document.getElementById("announcement-title").value = announcement.title;
+    document.getElementById("announcement-message").value =
+      announcement.message;
+    document.getElementById("announcement-date").value = announcement.date;
+
+    elements.announcementFormTitle.textContent = "Modifier l'annonce";
+    elements.announcementSubmitButton.textContent = "Mettre à jour l'annonce";
+    elements.cancelAnnouncementEdit.hidden = false;
+
+    elements.announcementForm.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
   }
 
   function renderDocuments() {
@@ -83,6 +154,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         </div>
         <div class="document-actions">
           <button class="button button-secondary" type="button" data-download="${item.id}">Télécharger</button>
+          <button class="button button-secondary" type="button" data-edit-document="${item.id}">Modifier</button>
           <button class="button button-danger" type="button" data-delete-document="${item.id}" data-file-path="${item.file_path}">Supprimer</button>
         </div>
       `;
@@ -103,6 +175,19 @@ document.addEventListener("DOMContentLoaded", async () => {
       });
 
     elements.documentsList
+      .querySelectorAll("[data-edit-document]")
+      .forEach((button) => {
+        button.addEventListener("click", () => {
+          const item = state.documents.find(
+            (doc) => doc.id === button.dataset.editDocument,
+          );
+          if (item) {
+            startEditDocument(item);
+          }
+        });
+      });
+
+    elements.documentsList
       .querySelectorAll("[data-delete-document]")
       .forEach((button) => {
         button.addEventListener("click", async () => {
@@ -112,6 +197,10 @@ document.addEventListener("DOMContentLoaded", async () => {
           }
 
           try {
+            if (editingDocumentId === button.dataset.deleteDocument) {
+              resetDocumentForm();
+            }
+
             await store.deleteDocument(
               button.dataset.deleteDocument,
               button.dataset.filePath,
@@ -138,11 +227,25 @@ document.addEventListener("DOMContentLoaded", async () => {
         <p>${announcement.message}</p>
         <span class="announcement-date">${store.formatDate(announcement.date)}</span>
         <div class="document-actions">
+          <button class="button button-secondary" type="button" data-edit-announcement="${announcement.id}">Modifier</button>
           <button class="button button-danger" type="button" data-delete-announcement="${announcement.id}">Supprimer</button>
         </div>
       `;
       elements.announcementsList.appendChild(article);
     });
+
+    elements.announcementsList
+      .querySelectorAll("[data-edit-announcement]")
+      .forEach((button) => {
+        button.addEventListener("click", () => {
+          const announcement = state.announcements.find(
+            (item) => item.id === button.dataset.editAnnouncement,
+          );
+          if (announcement) {
+            startEditAnnouncement(announcement);
+          }
+        });
+      });
 
     elements.announcementsList
       .querySelectorAll("[data-delete-announcement]")
@@ -154,6 +257,10 @@ document.addEventListener("DOMContentLoaded", async () => {
           }
 
           try {
+            if (editingAnnouncementId === button.dataset.deleteAnnouncement) {
+              resetAnnouncementForm();
+            }
+
             await store.deleteAnnouncement(button.dataset.deleteAnnouncement);
             await refresh();
           } catch (error) {
@@ -211,67 +318,107 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   elements.fileInput.addEventListener("change", () => {
     const file = elements.fileInput.files && elements.fileInput.files[0];
-    elements.selectedFile.textContent = file
-      ? `${file.name} — ${store.formatFileSize(file.size)}`
-      : "Aucun fichier sélectionné.";
+    if (file) {
+      elements.selectedFile.textContent = `${file.name} — ${store.formatFileSize(file.size)}`;
+    } else if (!editingDocumentId) {
+      elements.selectedFile.textContent = "Aucun fichier sélectionné.";
+    }
   });
 
   elements.documentForm.addEventListener("submit", async (event) => {
     event.preventDefault();
 
     const file = elements.fileInput.files && elements.fileInput.files[0];
-    if (!file) {
+    if (!editingDocumentId && !file) {
       window.alert("Veuillez sélectionner un fichier.");
       return;
     }
 
-    const submitButton = elements.documentForm.querySelector(
-      'button[type="submit"]',
-    );
-    const originalLabel = submitButton.textContent;
+    const isEditing = Boolean(editingDocumentId);
+    const submitButton = elements.documentSubmitButton;
     submitButton.disabled = true;
-    submitButton.textContent = "Publication en cours...";
+    submitButton.textContent = isEditing
+      ? "Mise à jour en cours..."
+      : "Publication en cours...";
+
+    const payload = {
+      title: document.getElementById("doc-title").value.trim(),
+      subject: document.getElementById("doc-subject").value.trim(),
+      teacher: document.getElementById("doc-teacher").value.trim(),
+      category: document.getElementById("doc-category").value,
+      description: document.getElementById("doc-description").value.trim(),
+      file: file || null,
+    };
 
     try {
-      await store.addDocument({
-        title: document.getElementById("doc-title").value.trim(),
-        subject: document.getElementById("doc-subject").value.trim(),
-        teacher: document.getElementById("doc-teacher").value.trim(),
-        category: document.getElementById("doc-category").value,
-        description: document.getElementById("doc-description").value.trim(),
-        file,
-      });
+      if (isEditing) {
+        await store.updateDocument(editingDocumentId, {
+          ...payload,
+          previousFilePath: file ? editingDocumentFilePath : null,
+        });
+      } else {
+        await store.addDocument(payload);
+      }
 
-      elements.documentForm.reset();
-      elements.selectedFile.textContent = "Aucun fichier sélectionné.";
+      resetDocumentForm();
+      submitButton.disabled = false;
       await refresh();
     } catch (error) {
-      window.alert(
-        "Publication impossible: " + (error.message || "erreur inconnue"),
-      );
-    } finally {
       submitButton.disabled = false;
-      submitButton.textContent = originalLabel;
+      submitButton.textContent = isEditing
+        ? "Mettre à jour le document"
+        : "Publier le document";
+      window.alert(
+        (isEditing ? "Mise à jour impossible: " : "Publication impossible: ") +
+          (error.message || "erreur inconnue"),
+      );
     }
+  });
+
+  elements.cancelDocumentEdit.addEventListener("click", () => {
+    resetDocumentForm();
   });
 
   elements.announcementForm.addEventListener("submit", async (event) => {
     event.preventDefault();
 
-    try {
-      await store.addAnnouncement({
-        title: document.getElementById("announcement-title").value.trim(),
-        message: document.getElementById("announcement-message").value.trim(),
-        date: document.getElementById("announcement-date").value,
-      });
+    const isEditing = Boolean(editingAnnouncementId);
+    const submitButton = elements.announcementSubmitButton;
+    submitButton.disabled = true;
+    submitButton.textContent = isEditing
+      ? "Mise à jour en cours..."
+      : "Publication en cours...";
 
-      elements.announcementForm.reset();
+    const payload = {
+      title: document.getElementById("announcement-title").value.trim(),
+      message: document.getElementById("announcement-message").value.trim(),
+      date: document.getElementById("announcement-date").value,
+    };
+
+    try {
+      if (isEditing) {
+        await store.updateAnnouncement(editingAnnouncementId, payload);
+      } else {
+        await store.addAnnouncement(payload);
+      }
+
+      resetAnnouncementForm();
+      submitButton.disabled = false;
       await refresh();
     } catch (error) {
+      submitButton.disabled = false;
+      submitButton.textContent = isEditing
+        ? "Mettre à jour l'annonce"
+        : "Publier l'annonce";
       window.alert(
-        "Publication impossible: " + (error.message || "erreur inconnue"),
+        (isEditing ? "Mise à jour impossible: " : "Publication impossible: ") +
+          (error.message || "erreur inconnue"),
       );
     }
+  });
+
+  elements.cancelAnnouncementEdit.addEventListener("click", () => {
+    resetAnnouncementForm();
   });
 
   elements.changePasswordForm.addEventListener("submit", async (event) => {

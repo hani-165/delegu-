@@ -175,7 +175,9 @@
                             <div class="section-heading">
                                 <div>
                                     <p class="section-label">Publication</p>
-                                    <h2>Ajouter un document</h2>
+                                    <h2 id="document-form-title">
+                                        Ajouter un document
+                                    </h2>
                                 </div>
                             </div>
 
@@ -243,12 +245,23 @@
                                     Aucun fichier sélectionné.
                                 </div>
 
-                                <button
-                                    class="button button-primary"
-                                    type="submit"
-                                >
-                                    Publier le document
-                                </button>
+                                <div class="form-actions">
+                                    <button
+                                        id="document-submit-button"
+                                        class="button button-primary"
+                                        type="submit"
+                                    >
+                                        Publier le document
+                                    </button>
+                                    <button
+                                        id="cancel-document-edit"
+                                        class="button button-secondary"
+                                        type="button"
+                                        hidden
+                                    >
+                                        Annuler la modification
+                                    </button>
+                                </div>
                             </form>
                         </section>
 
@@ -257,7 +270,9 @@
                                 <div class="section-heading">
                                     <div>
                                         <p class="section-label">Annonces</p>
-                                        <h2>Publier une annonce</h2>
+                                        <h2 id="announcement-form-title">
+                                            Publier une annonce
+                                        </h2>
                                     </div>
                                 </div>
 
@@ -288,12 +303,23 @@
                                             required
                                         />
                                     </label>
-                                    <button
-                                        class="button button-primary"
-                                        type="submit"
-                                    >
-                                        Publier l’annonce
-                                    </button>
+                                    <div class="form-actions">
+                                        <button
+                                            id="announcement-submit-button"
+                                            class="button button-primary"
+                                            type="submit"
+                                        >
+                                            Publier l’annonce
+                                        </button>
+                                        <button
+                                            id="cancel-announcement-edit"
+                                            class="button button-secondary"
+                                            type="button"
+                                            hidden
+                                        >
+                                            Annuler la modification
+                                        </button>
+                                    </div>
                                 </form>
                             </section>
 

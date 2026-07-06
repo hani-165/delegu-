@@ -1105,6 +1105,13 @@ input[type="file"]::file-selector-button:hover {
     gap: 16px;
 }
 
+/* ---------- Form actions ---------- */
+.form-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
 /* ---------- Auth screens ---------- */
 .auth-card {
     width: min(100%, 480px);

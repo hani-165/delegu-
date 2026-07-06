@@ -68,6 +68,7 @@ create policy "Authenticated update documents" on documents for update using (au
 create policy "Authenticated delete documents" on documents for delete using (auth.role() = 'authenticated');
 
 create policy "Authenticated insert announcements" on announcements for insert with check (auth.role() = 'authenticated');
+create policy "Authenticated update announcements" on announcements for update using (auth.role() = 'authenticated');
 create policy "Authenticated delete announcements" on announcements for delete using (auth.role() = 'authenticated');
 ```
 

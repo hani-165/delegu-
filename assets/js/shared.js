@@ -113,6 +113,56 @@
     }
   }
 
+  async function updateDocument(id, payload) {
+    const client = getClient();
+    const updateFields = {
+      title: payload.title,
+      subject: payload.subject,
+      teacher: payload.teacher,
+      category: payload.category,
+      description: payload.description || "",
+    };
+
+    if (payload.file) {
+      const file = payload.file;
+      const safeName = file.name.replace(/[^a-zA-Z0-9.\-_]/g, "_");
+      const path = `${Date.now()}-${safeName}`;
+
+      const { error: uploadError } = await client.storage
+        .from(STORAGE_BUCKET)
+        .upload(path, file, { cacheControl: "3600", upsert: false });
+
+      if (uploadError) {
+        throw uploadError;
+      }
+
+      updateFields.file_path = path;
+      updateFields.file_name = file.name;
+      updateFields.file_size = file.size;
+      updateFields.file_type = file.type || "application/octet-stream";
+    }
+
+    const { error } = await client
+      .from(DOCUMENTS_TABLE)
+      .update(updateFields)
+      .eq("id", id);
+
+    if (error) {
+      if (payload.file) {
+        await client.storage
+          .from(STORAGE_BUCKET)
+          .remove([updateFields.file_path]);
+      }
+      throw error;
+    }
+
+    if (payload.file && payload.previousFilePath) {
+      await client.storage
+        .from(STORAGE_BUCKET)
+        .remove([payload.previousFilePath]);
+    }
+  }
+
   async function deleteDocument(id, filePath) {
     const client = getClient();
     const { error } = await client.from(DOCUMENTS_TABLE).delete().eq("id", id);
@@ -159,6 +209,22 @@
       message: payload.message,
       date: payload.date,
     });
+
+    if (error) {
+      throw error;
+    }
+  }
+
+  async function updateAnnouncement(id, payload) {
+    const client = getClient();
+    const { error } = await client
+      .from(ANNOUNCEMENTS_TABLE)
+      .update({
+        title: payload.title,
+        message: payload.message,
+        date: payload.date,
+      })
+      .eq("id", id);
 
     if (error) {
       throw error;
@@ -249,11 +315,13 @@
     getExtension,
     getDocuments,
     addDocument,
+    updateDocument,
     deleteDocument,
     downloadDocument,
     getPublicFileUrl,
     getAnnouncements,
     addAnnouncement,
+    updateAnnouncement,
     deleteAnnouncement,
     subscribeToChanges,
     getSession,
