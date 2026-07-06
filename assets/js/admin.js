@@ -223,9 +223,11 @@ document.addEventListener("DOMContentLoaded", async () => {
       const article = document.createElement("article");
       article.className = "announcement-item";
       article.innerHTML = `
-        <h3>${announcement.title}</h3>
+        <div class="announcement-head">
+          <h3>${announcement.title}</h3>
+          <span class="announcement-date">${store.formatDate(announcement.date)}</span>
+        </div>
         <p>${announcement.message}</p>
-        <span class="announcement-date">${store.formatDate(announcement.date)}</span>
         <div class="document-actions">
           <button class="button button-secondary" type="button" data-edit-announcement="${announcement.id}">Modifier</button>
           <button class="button button-danger" type="button" data-delete-announcement="${announcement.id}">Supprimer</button>

@@ -136,9 +136,11 @@ document.addEventListener("DOMContentLoaded", async () => {
       const article = document.createElement("article");
       article.className = "announcement-item";
       article.innerHTML = `
-        <h3>${announcement.title}</h3>
+        <div class="announcement-head">
+          <h3>${announcement.title}</h3>
+          <span class="announcement-date">${store.formatDate(announcement.date)}</span>
+        </div>
         <p>${announcement.message}</p>
-        <span class="announcement-date">${store.formatDate(announcement.date)}</span>
       `;
       elements.announcements.appendChild(article);
     });

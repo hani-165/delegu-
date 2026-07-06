@@ -65,6 +65,10 @@
     box-sizing: border-box;
 }
 
+[hidden] {
+    display: none !important;
+}
+
 html {
     scroll-behavior: smooth;
     scrollbar-color: var(--ink-200) transparent;
@@ -239,6 +243,27 @@ input[type="file"]::file-selector-button {
 
 input[type="file"]::file-selector-button:hover {
     background: var(--brand-600);
+}
+
+input[type="date"] {
+    min-height: 48px;
+    color-scheme: light;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+    padding: 4px;
+    margin-left: 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    opacity: 0.6;
+    transition:
+        opacity var(--transition),
+        background var(--transition);
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator:hover {
+    opacity: 1;
+    background: var(--brand-50);
 }
 
 .visually-hidden {
@@ -914,11 +939,10 @@ input[type="file"]::file-selector-button:hover {
 
 /* ---------- Announcements ---------- */
 .announcement-item {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: flex-start;
-    gap: 6px 12px;
+    display: grid;
+    gap: 10px;
     padding: 20px;
+    align-content: start;
     transition:
         transform var(--transition),
         box-shadow var(--transition);
@@ -929,15 +953,20 @@ input[type="file"]::file-selector-button:hover {
     box-shadow: var(--shadow-lg);
 }
 
-.announcement-item h3 {
-    order: 1;
-    flex: 1 1 auto;
+.announcement-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.announcement-head h3 {
     margin: 0;
     font-size: 1.05rem;
+    line-height: 1.4;
 }
 
 .announcement-date {
-    order: 2;
     flex: 0 0 auto;
     font-weight: 700;
     font-size: 0.8rem;
@@ -945,21 +974,18 @@ input[type="file"]::file-selector-button:hover {
     background: var(--brand-50);
     padding: 5px 12px;
     border-radius: var(--radius-pill);
+    white-space: nowrap;
 }
 
 .announcement-item p {
-    order: 3;
-    flex: 1 1 100%;
-    margin: 2px 0 0;
+    margin: 0;
     color: var(--ink-500);
     line-height: 1.65;
 }
 
 .announcement-item .document-actions {
-    order: 4;
-    flex: 1 1 100%;
     justify-content: flex-end;
-    margin-top: 6px;
+    margin-top: 4px;
 }
 
 /* ---------- Steps ---------- */
