@@ -449,9 +449,12 @@ document.addEventListener("DOMContentLoaded", async () => {
   const session = await store.getSession();
   await handleSession(session);
   store.onAuthStateChange(handleSession);
-  store.subscribeToChanges(async () => {
+  store.subscribeToChanges(async (payload) => {
     if (!elements.app.hidden) {
       await refresh();
+    }
+    if (window.PortailNotifications) {
+      window.PortailNotifications.handleRealtimeEvent(payload);
     }
   });
 });

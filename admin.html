@@ -19,6 +19,7 @@
         <script src="assets/js/config.js"></script>
         <script src="assets/js/supabase-client.js"></script>
         <script defer src="assets/js/shared.js"></script>
+        <script defer src="assets/js/notifications.js"></script>
         <script defer src="assets/js/admin.js"></script>
     </head>
     <body class="admin-body">
@@ -40,6 +41,19 @@
                 </nav>
 
                 <div class="header-actions">
+                    <button
+                        id="notifications-toggle"
+                        class="icon-toggle"
+                        type="button"
+                        aria-pressed="true"
+                        aria-label="Désactiver les notifications sonores et vibrations"
+                    >
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path
+                                d="M12 22a2.25 2.25 0 0 0 2.22-1.91h-4.44A2.25 2.25 0 0 0 12 22Zm8-5.5v-1l-1.5-1.5V10a6.5 6.5 0 0 0-5.25-6.37V2.5a1.25 1.25 0 1 0-2.5 0v1.13A6.5 6.5 0 0 0 5.5 10v4l-1.5 1.5v1l-.5.5v1h17v-1l-.5-.5Z"
+                            />
+                        </svg>
+                    </button>
                     <a class="button button-secondary" href="index.html"
                         >Retour au site public</a
                     >

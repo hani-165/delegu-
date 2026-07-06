@@ -176,5 +176,10 @@ document.addEventListener("DOMContentLoaded", async () => {
   });
 
   await refresh();
-  store.subscribeToChanges(refresh);
+  store.subscribeToChanges((payload) => {
+    refresh();
+    if (window.PortailNotifications) {
+      window.PortailNotifications.handleRealtimeEvent(payload);
+    }
+  });
 });

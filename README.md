@@ -75,6 +75,13 @@ create policy "Authenticated delete announcements" on announcements for delete u
 ### 3. Activer le temps réel sur les deux tables
 Dans **Database > Replication**, activez la réplication (realtime) pour `documents` et `announcements`.
 
+Activez aussi `REPLICA IDENTITY FULL` sur les deux tables, pour que les suppressions incluent le titre du document ou de l'annonce (nécessaire pour des notifications complètes) :
+
+```sql
+alter table documents replica identity full;
+alter table announcements replica identity full;
+```
+
 ### 4. Créer le bucket de stockage
 Dans **Storage**, créez un bucket nommé exactement `documents` et cochez **Public**.
 
@@ -126,11 +133,28 @@ Utilisez bien la clé **anon public**, jamais la clé `service_role` (celle-ci n
 - Ne partagez jamais la clé `service_role`.
 - Le compte délégué doit être créé uniquement par vous, depuis le tableau de bord Supabase.
 
+## Notifications (son, vibration, navigateur)
+
+Chaque publication, modification ou suppression déclenche automatiquement, sur toutes les pages ouvertes (site public et espace délégué) :
+
+- une notification visuelle (toast) en bas ou en haut de l'écran
+- un son court généré nativement (aucun fichier audio à héberger)
+- une vibration sur les appareils compatibles (Android principalement)
+- une notification système du navigateur si l'onglet n'est pas au premier plan et que la permission a été accordée
+
+Le bouton en forme de cloche dans l'en-tête permet à chacun de couper le son/la vibration (la notification visuelle reste toujours affichée). Ce réglage est stocké localement dans le navigateur de chaque visiteur.
+
+**Limites à connaître :**
+- Safari sur iPhone/iPad ne supporte pas l'API de vibration (limitation d'Apple, pas du site).
+- Le son ne peut jouer qu'après au moins une interaction de l'utilisateur avec la page (règle imposée par tous les navigateurs pour éviter les sons intempestifs).
+- Les notifications système nécessitent que l'utilisateur clique une fois sur la cloche pour autoriser la permission.
+
 ## Fichiers principaux
 
 - `assets/css/app.css`
 - `assets/js/config.js` (à modifier avec vos identifiants Supabase)
 - `assets/js/supabase-client.js`
 - `assets/js/shared.js`
+- `assets/js/notifications.js`
 - `assets/js/index.js`
 - `assets/js/admin.js`
