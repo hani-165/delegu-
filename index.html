@@ -1,398 +1,241 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="fr">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>PORTAIL DES COURS - Licence 1 Informatique</title>
-    <meta name="description" content="Maquette moderne d'un portail universitaire de partage de cours pour Licence 1 Informatique." />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css" />
-  <script defer src="script.js"></script>
-</head>
-<body>
-  <div class="app-shell">
-    <aside class="sidebar" aria-label="Navigation principale">
-      <div class="brand-card">
-        <div class="brand-mark">PC</div>
-        <div>
-          <p class="brand-title">PORTAIL DES COURS</p>
-          <p class="brand-subtitle">Licence 1 Informatique</p>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Portail des cours - Accès public</title>
+        <meta
+            name="description"
+            content="Plateforme simple de partage de documents académiques. Les étudiants consultent et téléchargent les documents sans créer de compte."
+        />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+            rel="stylesheet"
+        />
+        <link rel="stylesheet" href="assets/css/app.css" />
+        <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+        <script src="assets/js/config.js"></script>
+        <script src="assets/js/supabase-client.js"></script>
+        <script defer src="assets/js/shared.js"></script>
+        <script defer src="assets/js/index.js"></script>
+    </head>
+    <body>
+        <div class="site-shell">
+            <header class="site-header">
+                <div class="brand">
+                    <div class="brand-mark">PC</div>
+                    <div>
+                        <p class="brand-title">Portail des cours</p>
+                        <p class="brand-subtitle">
+                            Plateforme publique de téléchargement
+                        </p>
+                    </div>
+                </div>
+
+                <nav class="top-nav" aria-label="Navigation principale">
+                    <a href="#documents">Documents</a>
+                    <a href="#annonces">Annonces</a>
+                    <a href="#fonctionnement">Fonctionnement</a>
+                </nav>
+
+                <a class="button button-primary" href="admin.html"
+                    >Espace délégué</a
+                >
+            </header>
+
+            <main class="page-content">
+                <section class="hero-section">
+                    <div class="hero-copy card">
+                        <p class="section-label">Accès étudiant</p>
+                        <h1>Téléchargez les documents sans créer de compte</h1>
+                        <p class="hero-text">
+                            Cette plateforme permet au délégué de publier des
+                            documents de cours et aux autres étudiants de les
+                            télécharger immédiatement. Aucun compte étudiant,
+                            aucune inscription, aucune connexion.
+                        </p>
+
+                        <div class="hero-actions">
+                            <a class="button button-primary" href="#documents"
+                                >Voir les documents</a
+                            >
+                            <a class="button button-secondary" href="admin.html"
+                                >Publier côté délégué</a
+                            >
+                        </div>
+
+                        <div class="hero-badges">
+                            <span>Accès public</span>
+                            <span>Téléchargement direct</span>
+                            <span>Mise à jour locale en temps réel</span>
+                        </div>
+                    </div>
+
+                    <aside class="hero-side card">
+                        <h2>Résumé</h2>
+                        <div class="stats-grid compact-grid">
+                            <article class="stat-card">
+                                <span class="stat-label">Documents</span>
+                                <strong id="public-doc-count">0</strong>
+                            </article>
+                            <article class="stat-card">
+                                <span class="stat-label">Matières</span>
+                                <strong id="public-subject-count">0</strong>
+                            </article>
+                            <article class="stat-card">
+                                <span class="stat-label">Annonces</span>
+                                <strong id="public-announcement-count"
+                                    >0</strong
+                                >
+                            </article>
+                        </div>
+
+                        <div class="info-note info-note-success">
+                            <strong>Important</strong>
+                            <p>
+                                Les étudiants n’ont pas besoin de se connecter.
+                                Seul l’espace du délégué utilise un code local
+                                minimal.
+                            </p>
+                        </div>
+                    </aside>
+                </section>
+
+                <section class="card tools-section" id="documents">
+                    <div class="section-heading">
+                        <div>
+                            <p class="section-label">Documents</p>
+                            <h2>Bibliothèque de cours</h2>
+                        </div>
+                        <p class="section-description">
+                            Recherchez par titre, matière, professeur ou type de
+                            document.
+                        </p>
+                    </div>
+
+                    <div class="toolbar">
+                        <label class="search-field" for="public-search">
+                            <span class="visually-hidden">Rechercher</span>
+                            <input
+                                id="public-search"
+                                type="search"
+                                placeholder="Rechercher un document..."
+                            />
+                        </label>
+
+                        <div
+                            class="filter-group"
+                            id="public-filters"
+                            aria-label="Filtrer par matière"
+                        ></div>
+                    </div>
+
+                    <div id="public-last-update" class="helper-text"></div>
+
+                    <div class="documents-wrapper">
+                        <div
+                            id="public-documents"
+                            class="document-list"
+                            aria-live="polite"
+                        ></div>
+                        <div id="public-empty-state" class="empty-state" hidden>
+                            <h3>Aucun document trouvé</h3>
+                            <p>
+                                Aucun document ne correspond à votre recherche
+                                pour le moment. Le délégué peut publier de
+                                nouveaux fichiers depuis l’espace admin.
+                            </p>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="two-columns">
+                    <section class="card" id="annonces">
+                        <div class="section-heading">
+                            <div>
+                                <p class="section-label">Annonces</p>
+                                <h2>Informations récentes</h2>
+                            </div>
+                        </div>
+
+                        <div
+                            id="public-announcements"
+                            class="announcement-list"
+                        ></div>
+                        <div
+                            id="public-announcements-empty"
+                            class="empty-state small-empty"
+                            hidden
+                        >
+                            <p>Aucune annonce publiée pour le moment.</p>
+                        </div>
+                    </section>
+
+                    <section class="card" id="fonctionnement">
+                        <div class="section-heading">
+                            <div>
+                                <p class="section-label">Fonctionnement</p>
+                                <h2>Comment utiliser la plateforme</h2>
+                            </div>
+                        </div>
+
+                        <div class="steps-list">
+                            <article class="step-item">
+                                <span>1</span>
+                                <div>
+                                    <h3>Le délégué publie</h3>
+                                    <p>
+                                        Il ajoute un titre, une matière, un
+                                        professeur et le fichier depuis l’espace
+                                        admin.
+                                    </p>
+                                </div>
+                            </article>
+                            <article class="step-item">
+                                <span>2</span>
+                                <div>
+                                    <h3>La liste se met à jour</h3>
+                                    <p>
+                                        Les documents apparaissent
+                                        automatiquement dans la bibliothèque
+                                        publique du navigateur.
+                                    </p>
+                                </div>
+                            </article>
+                            <article class="step-item">
+                                <span>3</span>
+                                <div>
+                                    <h3>Les étudiants téléchargent</h3>
+                                    <p>
+                                        Ils consultent et téléchargent
+                                        directement les documents, sans
+                                        inscription ni authentification.
+                                    </p>
+                                </div>
+                            </article>
+                        </div>
+
+                        <div class="info-note">
+                            <strong>Limite actuelle</strong>
+                            <p>
+                                Cette version est un prototype local dans le
+                                navigateur. Pour un partage réel entre plusieurs
+                                appareils, il faudra connecter un stockage en
+                                ligne.
+                            </p>
+                        </div>
+                    </section>
+                </section>
+            </main>
+
+            <footer class="site-footer">
+                <p>
+                    Portail des cours — version simplifiée sans compte étudiant
+                </p>
+                <a href="admin.html">Accéder à l’espace délégué</a>
+            </footer>
         </div>
-      </div>
-
-      <nav class="sidebar-nav">
-        <a class="nav-item active" href="#accueil">Accueil</a>
-        <a class="nav-item" href="#matieres">Toutes les matières</a>
-        <a class="nav-item" href="#documents">Derniers documents</a>
-        <a class="nav-item" href="#annonces">Annonces</a>
-        <a class="nav-item" href="#apropos">À propos</a>
-        <a class="nav-item" href="#contact">Contact</a>
-      </nav>
-
-      <div class="delegate-panel">
-        <div>
-          <p class="panel-label">Accès protégé</p>
-          <h3>Espace Délégué</h3>
-          <p>Connexion, téléversement et gestion des fichiers de la promotion.</p>
-        </div>
-        <a class="primary-button full-width" href="espace-delegue.html">Ouvrir l'espace</a>
-      </div>
-
-      <div class="sidebar-footer">
-        <p>Promotion 2026-2027</p>
-        <span> UCAO • departement du droit </span>
-      </div>
-    </aside>
-
-    <div class="main-area">
-      <header class="topbar" id="accueil">
-        <button class="icon-button mobile-menu-button" aria-label="Ouvrir le menu" aria-expanded="false">
-          <span></span>
-          <span></span>
-          <span></span>
-        </button>
-
-        <div class="topbar-brand">
-          <p class="eyebrow">Licence 2 droit </p>
-          <h1>PORTAIL DES COURS</h1>
-        </div>
-
-        <label class="search-bar" aria-label="Rechercher un document">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10.5 4a6.5 6.5 0 1 0 4.1 11.56l4.42 4.42 1.41-1.41-4.42-4.42A6.5 6.5 0 0 0 10.5 4Zm0 2a4.5 4.5 0 1 1 0 9 4.5 4.5 0 0 1 0-9Z"/></svg>
-          <input id="document-search" type="search" placeholder="Rechercher un cours, un TD ou un professeur..." />
-        </label>
-
-        <div class="topbar-actions">
-          <button class="icon-button notification-button" aria-label="Notifications">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22a2.25 2.25 0 0 0 2.22-1.91h-4.44A2.25 2.25 0 0 0 12 22Zm8-5.5v-1l-1.5-1.5V10a6.5 6.5 0 0 0-5.25-6.37V2.5a1.25 1.25 0 1 0-2.5 0v1.13A6.5 6.5 0 0 0 5.5 10v4l-1.5 1.5v1l-.5.5v1h17v-1l-.5-.5Z"/></svg>
-            <span class="notification-dot"></span>
-          </button>
-          <div class="profile-pill">
-            <div class="avatar">AD</div>
-            <div>
-              <strong>Admin délégués </strong>
-              <span>En ligne</span>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      <main class="dashboard-grid">
-        <section class="hero-card" aria-labelledby="hero-title">
-          <div class="hero-copy">
-            <p class="hero-kicker">Plateforme de partage académique</p>
-            <h2 id="hero-title">Bienvenue sur votre Portail des Cours</h2>
-            <p class="hero-text">Téléchargez facilement les cours, TD,et autres documents partagés par le délégué.</p>
-
-            <div class="hero-actions">
-              <a class="primary-button" href="espace-delegue.html">Connexion du délégué</a>
-              <button class="secondary-button" id="upload-trigger-button">Téléverser un fichier</button>
-            </div>
-
-            <div class="hero-features">
-              <div class="feature-chip">
-                <span>🔎</span> Recherche rapide
-              </div>
-              <div class="feature-chip">
-                <span>⬇️</span> Téléchargement direct
-              </div>
-              <div class="feature-chip">
-                <span>🔔</span> Notifications actives
-              </div>
-            </div>
-          </div>
-
-          <div class="hero-illustration" aria-hidden="true">
-            <svg viewBox="0 0 520 360" role="img" aria-label="Illustration d'étudiants, d'ordinateurs et de livres">
-              <defs>
-                <linearGradient id="bgGrad" x1="0%" x2="100%" y1="0%" y2="100%">
-                  <stop offset="0%" stop-color="#eaf2ff" />
-                  <stop offset="100%" stop-color="#d9e7ff" />
-                </linearGradient>
-                <linearGradient id="screenGrad" x1="0%" x2="100%" y1="0%" y2="100%">
-                  <stop offset="0%" stop-color="#1f6fff" />
-                  <stop offset="100%" stop-color="#0f3ea8" />
-                </linearGradient>
-              </defs>
-              <rect x="0" y="0" width="520" height="360" rx="28" fill="url(#bgGrad)" />
-              <circle cx="410" cy="85" r="48" fill="#fff" opacity="0.9" />
-              <circle cx="100" cy="66" r="30" fill="#fff" opacity="0.6" />
-              <rect x="205" y="106" width="180" height="130" rx="16" fill="#0f172a" opacity="0.08" />
-              <rect x="215" y="98" width="180" height="120" rx="16" fill="#ffffff" />
-              <rect x="228" y="111" width="154" height="90" rx="12" fill="url(#screenGrad)" />
-              <rect x="248" y="224" width="114" height="12" rx="6" fill="#94a3b8" />
-              <rect x="258" y="236" width="94" height="10" rx="5" fill="#cbd5e1" />
-              <rect x="56" y="178" width="92" height="110" rx="18" fill="#ffffff" />
-              <rect x="66" y="190" width="72" height="18" rx="9" fill="#dbeafe" />
-              <rect x="66" y="216" width="58" height="10" rx="5" fill="#e2e8f0" />
-              <rect x="66" y="234" width="64" height="10" rx="5" fill="#e2e8f0" />
-              <rect x="66" y="252" width="52" height="10" rx="5" fill="#e2e8f0" />
-              <circle cx="130" cy="283" r="20" fill="#2563eb" opacity="0.18" />
-              <circle cx="385" cy="272" r="18" fill="#2563eb" opacity="0.15" />
-              <g transform="translate(348 202)">
-                <rect x="0" y="0" width="76" height="54" rx="12" fill="#ffffff" />
-                <rect x="10" y="12" width="56" height="6" rx="3" fill="#bfdbfe" />
-                <rect x="10" y="24" width="40" height="6" rx="3" fill="#e2e8f0" />
-                <rect x="10" y="36" width="48" height="6" rx="3" fill="#e2e8f0" />
-                </g>
-                <g transform="translate(80 94)">
-                <rect x="0" y="0" width="70" height="30" rx="8" fill="#ffffff" />
-                <rect x="8" y="7" width="54" height="5" rx="2.5" fill="#93c5fd" />
-                <rect x="8" y="17" width="30" height="5" rx="2.5" fill="#dbeafe" />
-                </g>
-                <g transform="translate(400 168)">
-                <rect x="0" y="0" width="52" height="82" rx="10" fill="#ffffff" />
-                <rect x="8" y="8" width="36" height="14" rx="4" fill="#dbeafe" />
-                <rect x="8" y="30" width="34" height="6" rx="3" fill="#e2e8f0" />
-                <rect x="8" y="42" width="28" height="6" rx="3" fill="#e2e8f0" />
-                <rect x="8" y="54" width="30" height="6" rx="3" fill="#e2e8f0" />
-              </g>
-            </svg>
-          </div>
-        </section>
-
-        <section class="subjects-section" id="matieres">
-          <div class="section-heading">
-            <div>
-              <p class="section-kicker">Catalogue académique</p>
-              <h3>Matières disponibles</h3>
-            </div>
-            <button class="text-button">Voir toutes les matières</button>
-          </div>
-
-          <div class="subject-grid">
-            <article class="subject-card" data-subject="Programmation">
-              <div class="subject-icon">⌘</div>
-              <h4>Programmation</h4>
-              <p><span class="subject-count">24</span> documents</p>
-              <button class="ghost-button">Voir les documents</button>
-            </article>
-            <article class="subject-card" data-subject="Bases de données">
-              <div class="subject-icon">🗄️</div>
-              <h4>Bases de données</h4>
-              <p><span class="subject-count">18</span> documents</p>
-              <button class="ghost-button">Voir les documents</button>
-            </article>
-            <article class="subject-card" data-subject="Réseaux">
-              <div class="subject-icon">🌐</div>
-              <h4>Réseaux</h4>
-              <p><span class="subject-count">12</span> documents</p>
-              <button class="ghost-button">Voir les documents</button>
-            </article>
-            <article class="subject-card" data-subject="Mathématiques">
-              <div class="subject-icon">∑</div>
-              <h4>Mathématiques</h4>
-              <p><span class="subject-count">20</span> documents</p>
-              <button class="ghost-button">Voir les documents</button>
-            </article>
-            <article class="subject-card" data-subject="Algorithmique">
-              <div class="subject-icon">λ</div>
-              <h4>Algorithmique</h4>
-              <p><span class="subject-count">16</span> documents</p>
-              <button class="ghost-button">Voir les documents</button>
-            </article>
-            <article class="subject-card" data-subject="Anglais">
-              <div class="subject-icon">A</div>
-              <h4>Anglais</h4>
-              <p><span class="subject-count">9</span> documents</p>
-              <button class="ghost-button">Voir les documents</button>
-            </article>
-            <article class="subject-card" data-subject="Statistiques">
-              <div class="subject-icon">▦</div>
-              <h4>Statistiques</h4>
-              <p><span class="subject-count">11</span> documents</p>
-              <button class="ghost-button">Voir les documents</button>
-            </article>
-            <article class="subject-card muted-card" data-subject="Autres matières">
-              <div class="subject-icon">+</div>
-              <h4>Autres matières</h4>
-              <p><span class="subject-count">7</span> documents</p>
-              <button class="ghost-button">Voir les documents</button>
-            </article>
-          </div>
-        </section>
-
-        <section class="documents-section" id="documents">
-          <div class="section-heading">
-            <div>
-              <p class="section-kicker">Partage récent</p>
-              <h3>Derniers documents ajoutés</h3>
-            </div>
-            <div class="legend">
-              <span class="legend-item pdf">PDF</span>
-              <span class="legend-item doc">Word</span>
-              <span class="legend-item xls">Excel</span>
-            </div>
-          </div>
-
-          <div class="table-card">
-            <table>
-              <thead>
-                <tr>
-                  <th>Type</th>
-                  <th>Nom du document</th>
-                  <th>Matière</th>
-                  <th>Professeur</th>
-                  <th>Date d'ajout</th>
-                  <th>Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr data-document data-file-type="pdf" data-title="TD1 - Introduction à Python" data-subject="Programmation" data-professor="Pr. N'Guessan">
-                  <td><span class="file-badge pdf">PDF</span></td>
-                  <td>TD1 - Introduction à Python</td>
-                  <td>Programmation</td>
-                  <td>Pr. N'Guessan</td>
-                  <td>26/06/2026</td>
-                  <td><button class="download-button">Télécharger</button></td>
-                </tr>
-                <tr data-document data-file-type="doc" data-title="Cours - Modèle relationnel" data-subject="Bases de données" data-professor="Pr. Kouamé">
-                  <td><span class="file-badge doc">DOC</span></td>
-                  <td>Cours - Modèle relationnel</td>
-                  <td>Bases de données</td>
-                  <td>Pr. Kouamé</td>
-                  <td>25/06/2026</td>
-                  <td><button class="download-button">Télécharger</button></td>
-                </tr>
-                <tr data-document data-file-type="xls" data-title="Exercices - Séries statistiques" data-subject="Statistiques" data-professor="Pr. Akissi">
-                  <td><span class="file-badge xls">XLS</span></td>
-                  <td>Exercices - Séries statistiques</td>
-                  <td>Statistiques</td>
-                  <td>Pr. Akissi</td>
-                  <td>24/06/2026</td>
-                  <td><button class="download-button">Télécharger</button></td>
-                </tr>
-                <tr data-document data-file-type="pdf" data-title="TP Réseaux - Adressage IP" data-subject="Réseaux" data-professor="Pr. Traoré">
-                  <td><span class="file-badge pdf">PDF</span></td>
-                  <td>TP Réseaux - Adressage IP</td>
-                  <td>Réseaux</td>
-                  <td>Pr. Traoré</td>
-                  <td>23/06/2026</td>
-                  <td><button class="download-button">Télécharger</button></td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </section>
-
-        <aside class="right-column" aria-label="Informations complémentaires">
-          <section class="side-card" id="annonces">
-            <div class="section-heading compact">
-              <div>
-                <p class="section-kicker">Actualités</p>
-                <h3>Annonces</h3>
-              </div>
-            </div>
-            <div class="announcement">
-              <strong>Rattrapage Programmation</strong>
-              <p>La séance du jeudi est déplacée à 14h dans la salle B203.</p>
-            </div>
-            <div class="announcement">
-              <strong>TD Bases de données</strong>
-              <p>Le sujet corrigé est disponible au format PDF et Word.</p>
-            </div>
-          </section>
-
-          <section class="side-card">
-            <div class="section-heading compact">
-              <div>
-                <p class="section-kicker">Performance</p>
-                <h3>Statistiques</h3>
-              </div>
-            </div>
-            <div class="stats-list">
-              <div class="stat-row"><span>Documents partagés</span><strong id="documents-count">81</strong></div>
-              <div class="stat-row"><span>Téléchargements</span><strong id="downloads-count">1 248</strong></div>
-              <div class="stat-row"><span>Étudiants connectés</span><strong>92%</strong></div>
-              <div class="stat-row"><span>Alertes actives</span><strong id="alerts-count">4</strong></div>
-            </div>
-          </section>
-
-          <section class="side-card help-card">
-            <div class="section-heading compact">
-              <div>
-                <p class="section-kicker">Assistance</p>
-                <h3>Besoin d'aide ?</h3>
-              </div>
-            </div>
-            <p>Contactez le délégué pour signaler un document manquant, une erreur ou une mise à jour.</p>
-            <button class="primary-button full-width" id="help-contact-button">Contacter le délégué</button>
-          </section>
-        </aside>
-
-        <section class="info-cards" id="apropos">
-          <article class="info-card">
-            <div class="info-icon">🔐</div>
-            <h3>Connexion du délégué</h3>
-            <p>Interface sécurisée pour publier les documents officiels de la promotion.</p>
-          </article>
-          <article class="info-card">
-            <div class="info-icon">📤</div>
-            <h3>Téléversement de fichiers</h3>
-            <p>Ajout rapide de PDF, Word et Excel avec aperçu des métadonnées.</p>
-          </article>
-          <article class="info-card">
-            <div class="info-icon">⬇️</div>
-            <h3>Téléchargement des cours</h3>
-            <p>Accès instantané aux documents depuis mobile et ordinateur.</p>
-          </article>
-          <article class="info-card" id="contact">
-            <div class="info-icon">📊</div>
-            <h3>Statistiques de téléchargement</h3>
-            <p>Suivi visuel des documents les plus consultés par les étudiants.</p>
-          </article>
-        </section>
-      </main>
-
-      <footer class="footer">
-        <p>© 2026/2027 PORTAIL DES COURS. Tous droits réservés.</p>
-        <div class="footer-links">
-          <a href="mailto:contact@portaildescours.edu">Contact</a>
-        </div>
-      </footer>
-
-      <div class="modal-overlay" id="delegate-modal" aria-hidden="true">
-        <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="delegate-modal-title">
-          <div class="modal-header">
-            <div>
-              <p class="section-kicker">Accès sécurisé</p>
-              <h3 id="delegate-modal-title">Connexion du délégué</h3>
-            </div>
-            <button class="icon-button modal-close-button" type="button" aria-label="Fermer la fenêtre">×</button>
-          </div>
-
-          <p class="modal-description">Accédez à l’espace d’administration pour publier des fichiers, organiser les cours et suivre les téléchargements.</p>
-
-          <form class="login-form">
-            <label>
-              <span>Adresse e-mail</span>
-              <input type="email" placeholder="delegue@universite.edu" />
-            </label>
-            <label>
-              <span>Mot de passe</span>
-              <input type="password" placeholder="••••••••" />
-            </label>
-            <div class="login-form-row">
-              <label class="checkbox-field">
-                <input type="checkbox" />
-                <span>Rester connecté</span>
-              </label>
-              <a href="#contact">Mot de passe oublié ?</a>
-            </div>
-            <button class="primary-button full-width" type="button" id="delegate-submit-button">Se connecter</button>
-          </form>
-
-          <div class="modal-footnote">
-            <span>Connexion simulée pour la maquette UI/UX.</span>
-          </div>
-        </div>
-      </div>
-
-        <input id="file-upload-input" class="visually-hidden" type="file" accept=".pdf,.doc,.docx,.xls,.xlsx" />
-        <div class="toast" id="toast" aria-live="polite" aria-atomic="true"></div>
-    </div>
-    </div>
-</body>
+    </body>
 </html>

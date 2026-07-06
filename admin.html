@@ -1,0 +1,385 @@
+<!doctype html>
+<html lang="fr">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Portail des cours - Administration</title>
+        <meta
+            name="description"
+            content="Espace d’administration simplifié pour le délégué: publication de documents, annonces et gestion locale du portail."
+        />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+            rel="stylesheet"
+        />
+        <link rel="stylesheet" href="assets/css/app.css" />
+        <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+        <script src="assets/js/config.js"></script>
+        <script src="assets/js/supabase-client.js"></script>
+        <script defer src="assets/js/shared.js"></script>
+        <script defer src="assets/js/admin.js"></script>
+    </head>
+    <body class="admin-body">
+        <div class="site-shell admin-shell">
+            <header class="site-header">
+                <div class="brand">
+                    <div class="brand-mark">PC</div>
+                    <div>
+                        <p class="brand-title">Portail des cours</p>
+                        <p class="brand-subtitle">Espace du délégué</p>
+                    </div>
+                </div>
+
+                <nav class="top-nav" aria-label="Navigation admin">
+                    <a href="#admin-upload">Publier</a>
+                    <a href="#admin-documents">Documents</a>
+                    <a href="#admin-announcements">Annonces</a>
+                    <a href="#admin-settings">Paramètres</a>
+                </nav>
+
+                <div class="header-actions">
+                    <a class="button button-secondary" href="index.html"
+                        >Retour au site public</a
+                    >
+                    <button
+                        id="admin-logout"
+                        class="button button-dark"
+                        type="button"
+                    >
+                        Fermer la session
+                    </button>
+                </div>
+            </header>
+
+            <main class="page-content">
+                <section id="admin-gate" class="auth-grid">
+                    <article
+                        id="admin-config-warning"
+                        class="card auth-card"
+                        hidden
+                    >
+                        <p class="section-label">Configuration requise</p>
+                        <h1>Supabase n’est pas encore connecté</h1>
+                        <p>
+                            Renseignez l’URL et la clé publique de votre projet
+                            dans <code>assets/js/config.js</code>, puis
+                            rechargez cette page. Consultez
+                            <code>README.md</code> pour la procédure complète.
+                        </p>
+                    </article>
+
+                    <article
+                        id="admin-login-card"
+                        class="card auth-card"
+                        hidden
+                    >
+                        <p class="section-label">Accès délégué</p>
+                        <h1>Connexion du délégué</h1>
+                        <p>
+                            Les étudiants consultent le site publiquement sans
+                            compte. Seul le compte délégué, créé dans Supabase,
+                            peut publier des documents ici.
+                        </p>
+                        <form id="admin-login-form" class="stack-form">
+                            <label>
+                                <span>Adresse e-mail</span>
+                                <input
+                                    id="login-email"
+                                    type="email"
+                                    required
+                                    placeholder="delegue@exemple.com"
+                                    autocomplete="username"
+                                />
+                            </label>
+                            <label>
+                                <span>Mot de passe</span>
+                                <input
+                                    id="login-password"
+                                    type="password"
+                                    required
+                                    placeholder="Mot de passe"
+                                    autocomplete="current-password"
+                                />
+                            </label>
+                            <button class="button button-primary" type="submit">
+                                Ouvrir l’espace admin
+                            </button>
+                        </form>
+                        <p id="login-error" class="form-error" hidden></p>
+                        <p class="helper-text">
+                            Le compte du délégué se crée depuis le tableau de
+                            bord Supabase (Authentication &gt; Users).
+                        </p>
+                    </article>
+                </section>
+
+                <section id="admin-app" hidden>
+                    <section class="hero-section admin-hero">
+                        <div class="card hero-copy">
+                            <p class="section-label">
+                                Administration simplifiée
+                            </p>
+                            <h1>
+                                Publier des documents pour toute la promotion
+                            </h1>
+                            <p class="hero-text">
+                                Cette version se concentre sur l’essentiel:
+                                dépôt de documents, téléchargement public et
+                                annonces simples.
+                            </p>
+                            <div class="hero-badges">
+                                <span>Pas de compte étudiant</span>
+                                <span>Une seule page admin</span>
+                                <span>Gestion locale instantanée</span>
+                            </div>
+                        </div>
+
+                        <aside class="card hero-side">
+                            <h2>Vue rapide</h2>
+                            <div class="stats-grid compact-grid">
+                                <article class="stat-card">
+                                    <span class="stat-label">Documents</span>
+                                    <strong id="admin-doc-count">0</strong>
+                                </article>
+                                <article class="stat-card">
+                                    <span class="stat-label">Matières</span>
+                                    <strong id="admin-subject-count">0</strong>
+                                </article>
+                                <article class="stat-card">
+                                    <span class="stat-label">Annonces</span>
+                                    <strong id="admin-announcement-count"
+                                        >0</strong
+                                    >
+                                </article>
+                            </div>
+                        </aside>
+                    </section>
+
+                    <section class="two-columns admin-layout">
+                        <section class="card" id="admin-upload">
+                            <div class="section-heading">
+                                <div>
+                                    <p class="section-label">Publication</p>
+                                    <h2>Ajouter un document</h2>
+                                </div>
+                            </div>
+
+                            <form id="document-form" class="stack-form">
+                                <div class="form-grid two-columns-grid">
+                                    <label>
+                                        <span>Titre du document</span>
+                                        <input
+                                            id="doc-title"
+                                            type="text"
+                                            required
+                                            placeholder="Ex: TD 03 - Droit administratif"
+                                        />
+                                    </label>
+                                    <label>
+                                        <span>Matière</span>
+                                        <input
+                                            id="doc-subject"
+                                            type="text"
+                                            required
+                                            placeholder="Ex: Droit administratif"
+                                        />
+                                    </label>
+                                    <label>
+                                        <span>Professeur</span>
+                                        <input
+                                            id="doc-teacher"
+                                            type="text"
+                                            required
+                                            placeholder="Ex: Pr. Koffi"
+                                        />
+                                    </label>
+                                    <label>
+                                        <span>Type</span>
+                                        <select id="doc-category" required>
+                                            <option value="Cours">Cours</option>
+                                            <option value="TD">TD</option>
+                                            <option value="TP">TP</option>
+                                            <option value="Examen">
+                                                Examen
+                                            </option>
+                                            <option value="Corrigé">
+                                                Corrigé
+                                            </option>
+                                            <option value="Autre">Autre</option>
+                                        </select>
+                                    </label>
+                                </div>
+
+                                <label>
+                                    <span>Description courte</span>
+                                    <textarea
+                                        id="doc-description"
+                                        rows="4"
+                                        placeholder="Informations utiles pour les étudiants"
+                                    ></textarea>
+                                </label>
+
+                                <label>
+                                    <span>Fichier à publier</span>
+                                    <input id="doc-file" type="file" required />
+                                </label>
+
+                                <div id="selected-file" class="helper-text">
+                                    Aucun fichier sélectionné.
+                                </div>
+
+                                <button
+                                    class="button button-primary"
+                                    type="submit"
+                                >
+                                    Publier le document
+                                </button>
+                            </form>
+                        </section>
+
+                        <section class="stack-column">
+                            <section class="card" id="admin-announcements">
+                                <div class="section-heading">
+                                    <div>
+                                        <p class="section-label">Annonces</p>
+                                        <h2>Publier une annonce</h2>
+                                    </div>
+                                </div>
+
+                                <form id="announcement-form" class="stack-form">
+                                    <label>
+                                        <span>Titre</span>
+                                        <input
+                                            id="announcement-title"
+                                            type="text"
+                                            required
+                                            placeholder="Ex: Changement de salle"
+                                        />
+                                    </label>
+                                    <label>
+                                        <span>Message</span>
+                                        <textarea
+                                            id="announcement-message"
+                                            rows="4"
+                                            required
+                                            placeholder="Message diffusé aux étudiants"
+                                        ></textarea>
+                                    </label>
+                                    <label>
+                                        <span>Date</span>
+                                        <input
+                                            id="announcement-date"
+                                            type="date"
+                                            required
+                                        />
+                                    </label>
+                                    <button
+                                        class="button button-primary"
+                                        type="submit"
+                                    >
+                                        Publier l’annonce
+                                    </button>
+                                </form>
+                            </section>
+
+                            <section class="card" id="admin-settings">
+                                <div class="section-heading">
+                                    <div>
+                                        <p class="section-label">Paramètres</p>
+                                        <h2>Mot de passe du délégué</h2>
+                                    </div>
+                                </div>
+
+                                <form
+                                    id="change-password-form"
+                                    class="stack-form"
+                                >
+                                    <label>
+                                        <span>Nouveau mot de passe</span>
+                                        <input
+                                            id="new-admin-password"
+                                            type="password"
+                                            minlength="6"
+                                            required
+                                            placeholder="Minimum 6 caractères"
+                                        />
+                                    </label>
+                                    <button
+                                        class="button button-secondary"
+                                        type="submit"
+                                    >
+                                        Mettre à jour le mot de passe
+                                    </button>
+                                </form>
+
+                                <div class="info-note info-note-warning">
+                                    <strong>Bon à savoir</strong>
+                                    <p>
+                                        Ce compte est géré par Supabase
+                                        Authentication. Les étudiants n’ont
+                                        besoin d’aucun compte pour consulter ou
+                                        télécharger les documents.
+                                    </p>
+                                </div>
+                            </section>
+                        </section>
+                    </section>
+
+                    <section class="two-columns admin-layout">
+                        <section class="card" id="admin-documents">
+                            <div class="section-heading">
+                                <div>
+                                    <p class="section-label">
+                                        Gestion des documents
+                                    </p>
+                                    <h2>Documents publiés</h2>
+                                </div>
+                            </div>
+
+                            <div
+                                id="admin-documents-list"
+                                class="document-list"
+                            ></div>
+                            <div
+                                id="admin-documents-empty"
+                                class="empty-state"
+                                hidden
+                            >
+                                <h3>Aucun document publié</h3>
+                                <p>
+                                    Commencez par ajouter un document avec le
+                                    formulaire ci-dessus.
+                                </p>
+                            </div>
+                        </section>
+
+                        <section class="card">
+                            <div class="section-heading">
+                                <div>
+                                    <p class="section-label">
+                                        Historique des annonces
+                                    </p>
+                                    <h2>Annonces publiées</h2>
+                                </div>
+                            </div>
+
+                            <div
+                                id="admin-announcements-list"
+                                class="announcement-list"
+                            ></div>
+                            <div
+                                id="admin-announcements-empty"
+                                class="empty-state small-empty"
+                                hidden
+                            >
+                                <p>Aucune annonce publiée pour le moment.</p>
+                            </div>
+                        </section>
+                    </section>
+                </section>
+            </main>
+        </div>
+    </body>
+</html>
